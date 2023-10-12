@@ -1,5 +1,6 @@
-<div class="header-text justify-center flex my-4">
-    <img class="w-10 mx-4" src="./nfl.png" alt="" />
-    <h1 class="text-center flex font-bold text-4xl my-2"> NFL Weekly Picks </h1>
-</div>
 
+
+<div class="btn-container flex-col w-full flex justify-center items-center mt-10 gap-2">
+	<a href="/auth/log-in" class="btn btn-primary w-2/4">Log In</a>
+	<a href="/auth/sign-up" class="btn btn-primary w-2/4">Sign Up</a>
+</div>

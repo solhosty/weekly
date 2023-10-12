@@ -42,6 +42,34 @@ export interface Database {
         }
         Relationships: []
       }
+      invites: {
+        Row: {
+          email: string
+          id: number
+          league_id: string
+          status: string
+        }
+        Insert: {
+          email: string
+          id?: number
+          league_id: string
+          status?: string
+        }
+        Update: {
+          email?: string
+          id?: number
+          league_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_league_id_fkey"
+            columns: ["league_id"]
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       leagues: {
         Row: {
           creator_id: string
@@ -62,23 +90,26 @@ export interface Database {
           {
             foreignKeyName: "leagues_creator_id_fkey"
             columns: ["creator_id"]
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
       }
       memberships: {
         Row: {
+          creator: boolean
           id: string
           league_id: string
           user_id: string
         }
         Insert: {
+          creator: boolean
           id?: string
           league_id: string
           user_id: string
         }
         Update: {
+          creator?: boolean
           id?: string
           league_id?: string
           user_id?: string
@@ -93,7 +124,7 @@ export interface Database {
           {
             foreignKeyName: "memberships_user_id_fkey"
             columns: ["user_id"]
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
@@ -102,6 +133,7 @@ export interface Database {
         Row: {
           game_id: string
           id: string
+          league: string
           picked_team: string
           result: string | null
           user_id: string
@@ -109,6 +141,7 @@ export interface Database {
         Insert: {
           game_id: string
           id?: string
+          league: string
           picked_team: string
           result?: string | null
           user_id: string
@@ -116,6 +149,7 @@ export interface Database {
         Update: {
           game_id?: string
           id?: string
+          league?: string
           picked_team?: string
           result?: string | null
           user_id?: string
@@ -128,46 +162,65 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "picks_league_fkey"
+            columns: ["league"]
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "picks_user_id_fkey"
             columns: ["user_id"]
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
       }
-      users: {
+      profiles: {
         Row: {
-          created_at: string
-          email: string
+          avatar_url: string | null
           id: string
-          password: string
-          profile_picture: string | null
+          updated_at: string | null
           username: string | null
         }
         Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          password: string
-          profile_picture?: string | null
+          avatar_url?: string | null
+          id: string
+          updated_at?: string | null
           username?: string | null
         }
         Update: {
-          created_at?: string
-          email?: string
+          avatar_url?: string | null
           id?: string
-          password?: string
-          profile_picture?: string | null
+          updated_at?: string | null
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_avatar: {
+        Args: {
+          avatar_url: string
+        }
+        Returns: Record<string, unknown>
+      }
+      delete_storage_object: {
+        Args: {
+          bucket: string
+          object: string
+        }
+        Returns: Record<string, unknown>
+      }
     }
     Enums: {
       [_ in never]: never
