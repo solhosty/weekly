@@ -9,7 +9,7 @@
 
 	let { session, profiles, supabase } = data;
 	$: ({ session, supabase, profiles } = data);
-    let games = []; // Declaring the variable
+	let games = []; // Declaring the variable
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
@@ -28,7 +28,7 @@
 		if (data) {
 			userLeagues = data;
 		} else if (error) {
-			alert(error.message)
+			alert(error.message);
 		}
 	});
 
@@ -47,27 +47,51 @@
 
 	// Fetch the leagues created by the user and the number of picks made for each league
 	onMount(async () => {
-		const { data: leagues, error } = await supabase
+		const { data: leagues, error: leagueError } = await supabase
 			.from('leagues')
 			.select('*')
 			.eq('creator_id', session?.user?.id);
 
-		if (leagues) {
-			userLeagues = leagues;
-			for (let league of leagues) {
-				const { data: userPicks } = await supabase
-					.from('picks')
-					.select('*')
-					.eq('user_id', session?.user?.id)
-					.eq('league', league.id);
-				userPicksPerLeague[league.id] = userPicks ? userPicks.length : 0;
-			}
-		} else if (error) {
-			alert(error.message)
+		if (leagueError) {
+			alert(leagueError.message);
+			return;
 		}
-	});
 
+		userLeagues = leagues || [];
+
+		// Fetch all picks for the user
+		const { data: allUserPicks, error: picksError } = await supabase
+			.from('picks')
+			.select('*')
+			.eq('user_id', session?.user?.id);
+
+		if (picksError) {
+			alert(picksError.message);
+			return;
+		}
+
+		// Group picks by league
+		for (let league of userLeagues) {
+			userPicksPerLeague[league.id] = allUserPicks.filter(
+				(pick) => pick.league === league.id
+			).length;
+		}
+
+		// Fetch total games for the week (this part is missing in your code)
+		const { data: weekGames, error: gamesError } = await supabase
+			.from('games')
+			.select('*')
+			.eq('week', 6); // Assuming week number is 6
+
+		if (gamesError) {
+			alert(gamesError.message);
+			return;
+		}
+
+		games = weekGames || [];
+	});
 </script>
+
 <svelte:head>
 	<title>{$user}'s Account</title>
 </svelte:head>
@@ -76,13 +100,8 @@
 		class="form-widget flex flex-col items-center border-2 border-white rounded-lg w-full md:w-3/12 p-3 h-full my-6 border-opacity-20 shadow-sm shadow-gray-500"
 	>
 		<h2 class="text-center text-xl font-bold my-2">{username.toUpperCase()}'S ACCOUNT</h2>
-		<div class="divider my-0"></div> 
-		<form
-			class="form-widget w-full"
-			method="post"
-			action="?/update"
-			bind:this={profileForm}
-		>
+		<div class="divider my-0" />
+		<form class="form-widget w-full" method="post" action="?/update" bind:this={profileForm}>
 			<Avatar
 				{supabase}
 				bind:url={avatarUrl}
@@ -122,8 +141,11 @@
 				</div>
 			{:else if !$edit}
 				<div>
-					<button class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95 m-auto" on:click={editProfile}>
-						<img src="/edit.svg" alt="Games Icon" class="w-6 h-6"  />
+					<button
+						class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95 m-auto"
+						on:click={editProfile}
+					>
+						<img src="/edit.svg" alt="Games Icon" class="w-6 h-6" />
 						<span class="text-white font-bold">Edit Profile</span>
 					</button>
 				</div>
@@ -132,56 +154,61 @@
 
 		<form method="post" action="?/signout" use:enhance={handleSignOut}>
 			<div class="my-6">
-				<button class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95" disabled={loading}>
-					<img src="/signout.svg" alt="Games Icon" class="w-6 h-6"  />
+				<button
+					class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95"
+					disabled={loading}
+				>
+					<img src="/signout.svg" alt="Games Icon" class="w-6 h-6" />
 					<span class="text-white font-bold">Log Out</span>
 				</button>
 			</div>
 		</form>
 	</div>
-	
-<div
-class="form-widget flex flex-col items-center border-2 border-white border-opacity-20 rounded-lg w-full md:w-3/12 p-3 h-full my-6 shadow-sm shadow-gray-500"
->
-<h2 class="text-center text-xl font-bold my-2">LEAGUES</h2>
-<div class="divider my-0"></div> 
-{#if userLeagues.length}
-<div class="w-full h-64 overflow-y-auto">
-	{#each userLeagues as league}
-	<a href={`/leagues/${league.id}`}>
-		<div class="card p-2 my-2 w-full items-center text-center shadow-xl rounded-md border-2 border-white border-opacity-20 bg-black hover:border-opacity-80 relative hover:bottom-1">
-			<h4 class="card-title font-bold">{league.name}</h4>
-			{#if userPicksPerLeague[league.id] < games.length}
-				<!-- Display the number of games left to pick -->
-				<div class="badge badge-secondary">{games.length - userPicksPerLeague[league.id]}</div>
-			{:else}
-				<!-- Display "Completed" badge when all picks are made -->
-				<div class="badge badge-success">Completed</div>
-			{/if}
+
+	<div
+		class="form-widget flex flex-col items-center border-2 border-white border-opacity-20 rounded-lg w-full md:w-3/12 p-3 h-full my-6 shadow-sm shadow-gray-500"
+	>
+		<h2 class="text-center text-xl font-bold my-2">LEAGUES</h2>
+		<div class="divider my-0" />
+		{#if userLeagues.length}
+			<div class="w-full h-64 overflow-y-auto">
+				{#each userLeagues as league}
+					<a href={`/leagues/${league.id}`}>
+						<div
+							class="card p-2 my-2 w-full items-center text-center shadow-xl rounded-md border-2 border-white border-opacity-20 bg-black hover:border-opacity-80 relative hover:bottom-1"
+						>
+							<h3 class="card-title font-bold text-sm">{league.name}</h3>
+							{#if userPicksPerLeague[league.id] < games.length}
+								<!-- Display the number of games left to pick -->
+								<div class="badge my-2">
+									Missing {games.length - userPicksPerLeague[league.id]} games
+								</div>
+							{:else}
+								<!-- Display "Completed" badge when all picks are made -->
+								<div class="badge badge-success my-2 bg-green-800 text-white">Completed</div>
+							{/if}
+						</div>
+					</a>
+				{/each}
+			</div>
+		{:else}
+			<p>You haven't created any leagues yet.</p>
+		{/if}
+		<div class="flex flex-row items-center gap-2 my-5">
+			<button
+				class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95"
+				on:click={() => goto('/leagues/create')}
+			>
+				<img src="/create.svg" alt="Games Icon" class="w-6 h-6" />
+				<span class="text-white font-bold">Create</span>
+			</button>
+			<button
+				class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95"
+				on:click={() => goto('/leagues/join')}
+			>
+				<img src="/join.svg" alt="Games Icon" class="w-6 h-6" />
+				<span class="text-white font-bold">Join</span>
+			</button>
 		</div>
-	</a>
-{/each}
 	</div>
-{:else}
-	<p>You haven't created any leagues yet.</p>
-{/if}
-<div class="flex flex-row items-center gap-2 my-5">
-	<button class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95" on:click={() => goto('/leagues/create')}
-		>
-		<img src="/create.svg" alt="Games Icon" class="w-6 h-6"  />
-		<span class="text-white font-bold">Create</span>
-	</button>
-	<button class="px-4 py-2 flex items-center space-x-2 opacity-70 hover:opacity-95" on:click={() => goto('/leagues/join')}
-		>
-		<img src="/join.svg" alt="Games Icon" class="w-6 h-6"  />
-		<span class="text-white font-bold">Join</span>
-	</button>
-</div>
-</div>
-
-
-
-
-
-
 </div>

@@ -7,10 +7,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
 		throw redirect(303, '/');
 	}
 
-	const { data: leagues } = await supabase
-		.from('leagues')
-		.select(`name, creator_id`)
-		.single();
+	const { data: leagues } = await supabase.from('leagues').select(`name, creator_id`).single();
 	const { data: memberships } = await supabase
 		.from('memberships')
 		.select(`league_id, user_id, creator`)
@@ -18,9 +15,9 @@ export const load = async ({ locals: { supabase, getSession } }) => {
 	return { session, leagues, memberships };
 };
 type League = {
-    id: string;
-    name: string;
-    creator_id: string;
+	id: string;
+	name: string;
+	creator_id: string;
 };
 export const actions = {
 	update: async ({ request, locals: { supabase, getSession } }) => {
@@ -29,14 +26,14 @@ export const actions = {
 		const session = await getSession();
 
 		if (!session?.user?.id) {
-			return fail(400, { error: "User session is invalid or missing" });
+			return fail(400, { error: 'User session is invalid or missing' });
 		}
 
 		const { data: insertedLeague, error } = await supabase
-  			.from('leagues')
-  			.insert([{ name: name, creator_id: session.user.id }])
-  			.select('*');
-		console.log(insertedLeague)
+			.from('leagues')
+			.insert([{ name: name, creator_id: session.user.id }])
+			.select('*');
+		console.log(insertedLeague);
 
 		if (error || !insertedLeague) {
 			return fail(500, { error: error?.message });
@@ -61,7 +58,7 @@ export const actions = {
 			name
 		};
 	},
-	
+
 	signout: async ({ locals: { supabase, getSession } }) => {
 		const session = await getSession();
 		if (session) {

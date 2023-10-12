@@ -4,7 +4,6 @@
 </script>
 
 <Nav />
-<div class="bg-black min-h-screen"> 
+<div class="bg-black min-h-screen">
 	<slot />
-
 </div>
