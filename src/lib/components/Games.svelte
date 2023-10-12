@@ -54,11 +54,13 @@ function hasGameStarted(dateStr) {
 <div class="grid grid-cols-1 md:grid-cols-3 gap-z mx-auto w-8/12 h-96 overflow-auto">
     {#each games as game}
     <div class="card w-72 flex justify-center my-2 bg-black shadow-xl border-white border-2 border-opacity-30 hover:border-opacity-90 relative hover:bottom-1">
-        <div class="card-body">
-        <h2 class="card-title">{game.home_team} vs {game.away_team}</h2>
-        <p>Date: {formatDate(game.date)}</p>
-        <div class="card-actions justify-end">
-            Pick:
+        <div class="badge badge-outline my-2 mx-2">{game.status}</div>
+        <div class="card-body my-0">
+        <h2 class="card-title my-0">{game.home_team} vs {game.away_team}</h2>
+        <p class="text-sm">Date: {formatDate(game.date)}</p>
+        <div class="badge badge-outline">{game.home_team} {(game.home_team_score || 0)} - {game.away_team} {(game.away_team_score) || 0}</div>
+
+        <div class="card-actions justify-center my-2">
             <label>
                 <input type="radio" bind:group={userPicks[game.id]} value={game.home_team} disabled={hasGameStarted(game.date)} /> {game.home_team}
             </label>

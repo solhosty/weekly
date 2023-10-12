@@ -9,6 +9,7 @@
 
 	let { session, profiles, supabase } = data;
 	$: ({ session, supabase, profiles } = data);
+    let games = []; // Declaring the variable
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
@@ -17,20 +18,19 @@
 	$: user.set(username);
 	let userLeagues: string | any[] = []; // This will store the leagues created by the user
 
-// Fetch the leagues created by the user when the component is mounted
-onMount(async () => {
-	const { data, error } = await supabase
-		.from('leagues')
-		.select('*')
-		.eq('creator_id', session?.user?.id);
+	// Fetch the leagues created by the user when the component is mounted
+	onMount(async () => {
+		const { data, error } = await supabase
+			.from('leagues')
+			.select('*')
+			.eq('creator_id', session?.user?.id);
 
-	if (data) {
-		userLeagues = data;
-	} else if (error) {
-		alert(error.message)
-	}
-});
-
+		if (data) {
+			userLeagues = data;
+		} else if (error) {
+			alert(error.message)
+		}
+	});
 
 	const handleSignOut = (): (({ update }: { update: () => void }) => Promise<void>) => {
 		loading = true;
@@ -42,6 +42,31 @@ onMount(async () => {
 	async function editProfile() {
 		$edit = true;
 	}
+	// This will store the number of picks made by the user for each league
+	let userPicksPerLeague: Record<string, number> = {};
+
+	// Fetch the leagues created by the user and the number of picks made for each league
+	onMount(async () => {
+		const { data: leagues, error } = await supabase
+			.from('leagues')
+			.select('*')
+			.eq('creator_id', session?.user?.id);
+
+		if (leagues) {
+			userLeagues = leagues;
+			for (let league of leagues) {
+				const { data: userPicks } = await supabase
+					.from('picks')
+					.select('*')
+					.eq('user_id', session?.user?.id)
+					.eq('league', league.id);
+				userPicksPerLeague[league.id] = userPicks ? userPicks.length : 0;
+			}
+		} else if (error) {
+			alert(error.message)
+		}
+	});
+
 </script>
 <svelte:head>
 	<title>{$user}'s Account</title>
@@ -124,12 +149,18 @@ class="form-widget flex flex-col items-center border-2 border-white border-opaci
 <div class="w-full h-64 overflow-y-auto">
 	{#each userLeagues as league}
 	<a href={`/leagues/${league.id}`}>
-						<div class="card p-2 my-2 w-full items-center text-center shadow-xl rounded-md border-2 border-white border-opacity-20 bg-black hover:border-opacity-80 relative hover:bottom-1">
-					  <h4 class="card-title font-bold">{league.name}</h4>
-				  </div>
-				</a>
-
-		{/each}
+		<div class="card p-2 my-2 w-full items-center text-center shadow-xl rounded-md border-2 border-white border-opacity-20 bg-black hover:border-opacity-80 relative hover:bottom-1">
+			<h4 class="card-title font-bold">{league.name}</h4>
+			{#if userPicksPerLeague[league.id] < games.length}
+				<!-- Display the number of games left to pick -->
+				<div class="badge badge-secondary">{games.length - userPicksPerLeague[league.id]}</div>
+			{:else}
+				<!-- Display "Completed" badge when all picks are made -->
+				<div class="badge badge-success">Completed</div>
+			{/if}
+		</div>
+	</a>
+{/each}
 	</div>
 {:else}
 	<p>You haven't created any leagues yet.</p>
