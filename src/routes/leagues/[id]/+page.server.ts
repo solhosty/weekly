@@ -11,6 +11,7 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
 		.select('user_id, points')
 		.eq('league_id', leagueId);
 	const { data: games } = await supabase.from('games').select('*').eq('week', 6);
+	console.log(games);
 	if (!memberships) {
 		return { status: 404, error: new Error('Membership not found') };
 	}

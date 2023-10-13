@@ -79,8 +79,8 @@
 				<p class="text-sm">Date: {formatDate(game.date)}</p>
 				<div class="badge badge-outline">
 					{game.home_team}
-					{game.home_team_score || 0} - {game.away_team}
-					{game.away_team_score || 0}
+					{game.home_score} - {game.away_team}
+					{game.away_score}
 				</div>
 
 				<div class="card-actions justify-center my-4">
@@ -93,7 +93,7 @@
 						/>
 						{game.home_team}
 					</label>
-					<div class="divider lg:divider-horizontal" />
+                    <div class="divider lg:divider-horizontal"></div> 
 
 					<label class="text-white">
 						<input

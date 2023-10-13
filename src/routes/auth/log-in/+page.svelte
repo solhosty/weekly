@@ -29,20 +29,24 @@
 
 		goto('/account'); // <-- Use goto for redirection
 	};
-
+	
 	const signUp = async () => {
 		const supaBaseClient = data.supabase;
+		signupEmail = signupEmail.trim();
+		signUpPassword = signUpPassword.trim();
 		const { user, session, error } = await supaBaseClient.auth.signUp({
-			signupEmail,
-			signUpPassword
-		});
+    email: signupEmail,
+    password: signUpPassword
+});
 
 		if (error) {
 			errorMessage = error.message;
 			return;
+		} else { 
+			errorMessage = `Account created. Check ${signupEmail} for verification link.`;
+
 		}
 	};
-
 	export let data;
 </script>
 

@@ -1,6 +1,8 @@
 <!-- src/routes/leagues/[id]/+page.svelte -->
 
 <script>
+// @ts-nocheck
+
 	import Placeholder from '$lib/components/Placeholder.svelte';
 	import Members from '$lib/components/Members.svelte';
 	import Games from '$lib/components/Games.svelte';
@@ -27,6 +29,26 @@
 			unpickedGamesCount = data.games.length;
 		}
 	});
+	let inviteCode = '';
+
+async function generateAndStoreInviteCode() {
+	inviteCode = Math.random().toString(36).substr(2, 8).toUpperCase();
+	
+	const { error } = await supabase
+		.from('invites')
+		.insert([
+			{
+				invite_code: inviteCode,
+				league_id: data.league.id,
+				status: 'active'
+			}
+		]);
+
+	if (error) {
+		console.error("Error storing invite code:", error);
+		// Handle error, maybe show a message to the user.
+	}
+}
 </script>
 
 {#if data.status !== 404}
@@ -93,11 +115,16 @@
 		<div>
 			<Leaderboard leagueName={data.league.name} members={data.leaderboard} />
 		</div>
-	{:else if activeTab === 'invite'}
+		{:else if activeTab === 'invite'}
 		<div>
-			<Placeholder />
+			{#if inviteCode}
+				<h2 class="text-center">Your invite code is: {inviteCode}</h2>
+			{:else}
+				<button class="flex m-auto" on:click={generateAndStoreInviteCode}> <h2> Generate Invite Code</h2></button>
+			{/if}
 		</div>
 	{/if}
+	
 {:else}
 	<p>Loading or no data available...</p>
 {/if}
