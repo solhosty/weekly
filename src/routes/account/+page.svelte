@@ -31,6 +31,15 @@
 			alert(error.message);
 		}
 	});
+	let fontSizeClass = 'text-xl'; // default font size
+
+$: {
+    if (username.length > 14 && username.length <= 18) {
+        fontSizeClass = 'text-lg'; // slightly smaller font for medium-length usernames
+    } else if (username.length > 18) {
+        fontSizeClass = 'text-base'; // even smaller font for long usernames
+    }
+}
 
 	const handleSignOut = (): (({ update }: { update: () => void }) => Promise<void>) => {
 		loading = true;
@@ -116,8 +125,8 @@
 	<div
 		class="form-widget flex flex-col items-center border-2 border-white rounded-lg w-full md:w-3/12 p-3 h-full my-6 border-opacity-20 shadow-sm shadow-gray-500"
 	>
-		<h2 class="text-center text-xl font-bold my-2">{username.toUpperCase()}'S ACCOUNT</h2>
-		<div class="divider my-0" />
+	<h2 class="text-center font-bold my-2 {fontSizeClass}">{username.toUpperCase()}'S ACCOUNT</h2>
+	<div class="divider my-0" />
 		<form class="form-widget w-full" method="post" action="?/update" bind:this={profileForm}>
 			<Avatar
 				{supabase}
@@ -145,6 +154,7 @@
 						id="username"
 						name="username"
 						type="text"
+						maxlength="14"
 						value={form?.username ?? username}
 					/>
 				</div>
