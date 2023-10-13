@@ -10,9 +10,9 @@
 	<img src="/menu.svg" class="w-8 h-8" alt="" />
 </button>
 <dialog id="my_modal_2" class="modal">
-	<div class="modal-box">
-		<h3 class="font-bold text-lg">Hello!</h3>
-		<p class="py-4">Press ESC key or click outside to close</p>
+	<div class="modal-box bg-black">
+		<a href="/account" class="btn w-full bg-black border-2 my-2 border-white border-opacity-25"> <h3 class="text-md">Account </h3> </a>
+		<button class="btn w-full bg-black border-2 my-2 border-white border-opacity-25"> <h3 class="text-md">Leagues (Coming Soon) </h3> </button>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button>close</button>
