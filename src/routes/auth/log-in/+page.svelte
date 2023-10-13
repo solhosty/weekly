@@ -8,7 +8,8 @@
 	let signUpPassword = '';
 	let password = '';
 	let errorMessage = '';
-	let loaded = false; // <-- Reactive variable for page load
+	let successMessage = '';
+	let loaded = false; 
 
 	onMount(() => {
 		setTimeout(() => {
@@ -27,24 +28,23 @@
 			return;
 		}
 
-		goto('/account'); // <-- Use goto for redirection
+		goto('/account'); 
 	};
-	
+
 	const signUp = async () => {
 		const supaBaseClient = data.supabase;
 		signupEmail = signupEmail.trim();
 		signUpPassword = signUpPassword.trim();
 		const { user, session, error } = await supaBaseClient.auth.signUp({
-    email: signupEmail,
-    password: signUpPassword
-});
+			email: signupEmail,
+			password: signUpPassword
+		});
 
 		if (error) {
 			errorMessage = error.message;
 			return;
-		} else { 
-			errorMessage = `Account created. Check ${signupEmail} for verification link.`;
-
+		} else {
+			successMessage = `Account created. Check ${signupEmail} for verification link.`;
 		}
 	};
 	export let data;
@@ -111,7 +111,7 @@
 	</div>
 {/if}
 {#if errorMessage}
-	<div class="alert alert-error w-2/4 flex justify-center m-auto my-4">
+	<div class="alert alert-error w-2/4 flex sm:w-4/4 sm:p-2 justify-center m-auto my-4">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			class="stroke-current shrink-0 h-6 w-6"
@@ -125,5 +125,22 @@
 			/></svg
 		>
 		<span>{errorMessage}</span>
+	</div>
+{/if}
+{#if successMessage}
+	<div class="alert alert-success w-2/4 flex sm:w-4/4 sm:p-2 justify-center m-auto my-4">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="stroke-current shrink-0 h-6 w-6"
+			fill="none"
+			viewBox="0 0 24 24"
+			><path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+			/></svg
+		>
+		<span>{successMessage}</span>
 	</div>
 {/if}
