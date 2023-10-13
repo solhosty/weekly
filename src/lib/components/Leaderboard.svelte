@@ -8,6 +8,7 @@
 	 */
 	export let leagueName;
 	$: sortedMembers = members.slice().sort((a, b) => b.points - a.points);
+	
 </script>
 
 {#if Array.isArray(members)}
@@ -17,9 +18,9 @@
 	</div>
 
 	{#each sortedMembers as member, index}
-		<div
-			class="card w-5/12 h-12 p-2 bg-black text-md justify-center flex items-left m-auto border-2 border-white border-opacity-30 my-2 shadow-xl hover:border-opacity-90"
-		>
+	<div
+	class="card w-12/12 lg:w-5/12 md:w-5/12 h-12 p-2 bg-black text-md justify-center flex items-left m-auto border-2 border-white border-opacity-30 my-2 shadow-xl hover:border-opacity-90"
+>
 			<div class="card-body">
 				<h2 class="card-title mt-2 text-sm">{index + 1}. {member.username} - {member.points}</h2>
 				<div class="card-actions justify-end" />

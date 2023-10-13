@@ -10,7 +10,7 @@
 	let { session, profiles, supabase } = data;
 	$: ({ session, supabase, profiles } = data);
 	let games = []; // Declaring the variable
-
+	let userPicksPerLeague: Record<string, number> = {}; // This will store the number of picks made by the user for each league
 	let profileForm: HTMLFormElement;
 	let loading = false;
 	let username: string = profiles?.username ?? '';
@@ -33,13 +33,13 @@
 	});
 	let fontSizeClass = 'text-xl'; // default font size
 
-$: {
-    if (username.length > 14 && username.length <= 18) {
-        fontSizeClass = 'text-lg'; // slightly smaller font for medium-length usernames
-    } else if (username.length > 18) {
-        fontSizeClass = 'text-base'; // even smaller font for long usernames
-    }
-}
+	$: {
+		if (username.length > 14 && username.length <= 18) {
+			fontSizeClass = 'text-lg'; // slightly smaller font for medium-length usernames
+		} else if (username.length > 18) {
+			fontSizeClass = 'text-base'; // even smaller font for long usernames
+		}
+	}
 
 	const handleSignOut = (): (({ update }: { update: () => void }) => Promise<void>) => {
 		loading = true;
@@ -48,16 +48,14 @@ $: {
 			update();
 		};
 	};
+
 	async function editProfile() {
 		$edit = true;
 	}
-	// This will store the number of picks made by the user for each league
-	let userPicksPerLeague: Record<string, number> = {};
 
 	// Fetch the leagues created by the user and the number of picks made for each league
 	onMount(async () => {
 		const user = session?.user?.id;
-
 		// Fetch leagues where the user is a member
 		const { data: memberLeagues, error: memberError } = await supabase
 			.from('memberships')
@@ -125,8 +123,8 @@ $: {
 	<div
 		class="form-widget flex flex-col items-center border-2 border-white rounded-lg w-full md:w-3/12 p-3 h-full my-6 border-opacity-20 shadow-sm shadow-gray-500"
 	>
-	<h2 class="text-center font-bold my-2 {fontSizeClass}">{username.toUpperCase()}'S ACCOUNT</h2>
-	<div class="divider my-0" />
+		<h2 class="text-center font-bold my-2 {fontSizeClass}">{username.toUpperCase()}'S ACCOUNT</h2>
+		<div class="divider my-0" />
 		<form class="form-widget w-full" method="post" action="?/update" bind:this={profileForm}>
 			<Avatar
 				{supabase}
