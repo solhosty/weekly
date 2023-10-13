@@ -21,7 +21,7 @@
 			class="card w-80 h-12 p-2 bg-black text-md justify-center flex items-center m-auto border-2 border-white border-opacity-30 my-2 shadow-xl hover:border-opacity-90"
 		>
 			<div class="card-body">
-				<h2 class="card-title mt-2">{member.username} - {member.points}</h2>
+				<h2 class="card-title mt-2 text-sm">{member.username} - {member.points}</h2>
 				<div class="card-actions justify-end" />
 			</div>
 		</div>

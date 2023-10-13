@@ -3,6 +3,16 @@
 	 * @type {any[]}
 	 */
 	export let members = [];
+	/**
+	 * @param {string} username
+	 */
+	function truncateUsername(username) {
+		const maxLength = 6;
+		if (username.length > maxLength) {
+			return username.substring(0, maxLength) + '...';
+		}
+		return username;
+	}
 </script>
 
 {#if Array.isArray(members)}
@@ -12,7 +22,7 @@
 			class="card w-72 h-12 p-2 bg-black justify-center flex items-center m-auto border-2 border-white border-opacity-30 my-2 shadow-xl hover:border-opacity-90"
 		>
 			<div class="card-body">
-				<h2 class="card-title mt-2">{member.username}</h2>
+				<h2 class="card-title mt-2">{truncateUsername(member.username)}</h2>
 				<div class="card-actions justify-end" />
 			</div>
 		</div>
@@ -20,3 +30,9 @@
 {:else}
 	<p>No members available.</p>
 {/if}
+
+
+
+
+
+
