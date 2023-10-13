@@ -26,7 +26,7 @@
 			<div class="btn-container flex-col w-full flex justify-center items-center mt-10 gap-2">
 				<a
 					href="/auth/log-in"
-					class="btn bg-black border-white hover:bg-white hover:text-black btn-primary w-1/4"
+					class="btn bg-black border-white hover:bg-white hover:text-black btn-primary w-full lg:w-1/4 md:w-1/4"
 				>
 					<h2>Log In / Sign Up</h2></a
 				>
