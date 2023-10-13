@@ -9,7 +9,7 @@
 	let password = '';
 	let errorMessage = '';
 	let successMessage = '';
-	let loaded = false; 
+	let loaded = false;
 
 	onMount(() => {
 		setTimeout(() => {
@@ -28,7 +28,7 @@
 			return;
 		}
 
-		goto('/account'); 
+		goto('/account');
 	};
 
 	const signUp = async () => {

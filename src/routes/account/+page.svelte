@@ -47,34 +47,34 @@
 
 	// Fetch the leagues created by the user and the number of picks made for each league
 	onMount(async () => {
-    const user = session?.user?.id;
+		const user = session?.user?.id;
 
-    // Fetch leagues where the user is a member
-    const { data: memberLeagues, error: memberError } = await supabase
-        .from('memberships')
-        .select('league_id')
-        .eq('user_id', user);
+		// Fetch leagues where the user is a member
+		const { data: memberLeagues, error: memberError } = await supabase
+			.from('memberships')
+			.select('league_id')
+			.eq('user_id', user);
 
-    if (memberError) {
-        alert(memberError.message);
-        return;
-    }
+		if (memberError) {
+			alert(memberError.message);
+			return;
+		}
 
-    // Extract league IDs
-    const leagueIds = memberLeagues.map(m => m.league_id);
+		// Extract league IDs
+		const leagueIds = memberLeagues.map((m) => m.league_id);
 
-    // Fetch league details
-    const { data: leagues, error: leagueError } = await supabase
-        .from('leagues')
-        .select('*')
-        .in('id', leagueIds);
+		// Fetch league details
+		const { data: leagues, error: leagueError } = await supabase
+			.from('leagues')
+			.select('*')
+			.in('id', leagueIds);
 
-    if (leagueError) {
-        alert(leagueError.message);
-        return;
-    }
+		if (leagueError) {
+			alert(leagueError.message);
+			return;
+		}
 
-    userLeagues = leagues || [];
+		userLeagues = leagues || [];
 
 		// Fetch all picks for the user
 		const { data: allUserPicks, error: picksError } = await supabase
